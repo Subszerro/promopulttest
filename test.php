@@ -273,5 +273,7 @@ if ($MailRu->connect()) {
 	} else {
 		echo $parseToken['error'];
 	}
+} else {
+	echo 'ERROR. Не удалось подключиться к почтовому ящику. Проверьте email + пароль и настройки соединения.';
 }
 exit();
