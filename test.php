@@ -147,10 +147,11 @@ class MailRu
 	/**
 	 * Метод отправляет запрос на https://e.mail.ru/api/v1/threads/status/smart для получение всех данных из почтового ящика
 	 *
+	 * @param int $page Страница пагинации
 	 * @param int $limit Сколько сообщений выводить на странице, по умолчанию 25
 	 * @return array
 	 */
-	public function getContent($limit = self::RECORDS_ON_PAGE): array
+	public function getContent(int $page, int $limit = self::RECORDS_ON_PAGE): array
 	{
 		if (!$this->email) {
 			return [
@@ -166,10 +167,6 @@ class MailRu
 		}
 
 		//Выбираем постраничное смещение
-		$page = (int) $_GET['page'];
-		if (!$page) {
-			$page = 1;
-		}
 		$offset = $limit * ($page - 1);
 
 		//Параметры для запроса
@@ -182,7 +179,7 @@ class MailRu
 			'token=' . $this->token,
 		];
 
-		$ch = curl_init();   
+		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, self::MAIL_INBOX_API . '?' . implode('&', $params));
 		curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookies.txt');
 		curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookies.txt');
@@ -238,7 +235,12 @@ $MailRu = new MailRu($email, $password);
 if ($MailRu->connect()) {
 	$parseToken = $MailRu->parseToken();
 	if ($parseToken['success']) {
-		$result = $MailRu->getContent();
+		$page = (int) $_GET['page'];
+		if (!$page) {
+			$page = 1;
+		}
+
+		$result = $MailRu->getContent($page);
 		if ($result['success'] && is_object($result['response'])) {
 			if ($result['response']->status == MailRu::STATUS_OK) {
 				if (is_array($result['response']->body->threads)) {
@@ -251,10 +253,7 @@ if ($MailRu->connect()) {
 							//Выводим заголовок письма!
 							echo  $key . '. ' . $threads->subject . '<br>';
 						}
-						$page = (int) $_GET['page'];
-						if (!$page) {
-							$page = 1;
-						}
+						
 						echo '<br>';
 						if ($page > 1) {
 							echo '<a href="/test.php?page=' . ($page - 1) . '"><< Предыдущая страница</a> | ';
