@@ -167,7 +167,7 @@ class MailRu
 		}
 
 		//Выбираем постраничное смещение
-		if (!$page) {
+		if ($page <= 0) {
 			$page = 1;
 		}
 		$offset = $limit * ($page - 1);
