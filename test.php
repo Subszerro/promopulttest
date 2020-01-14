@@ -49,6 +49,8 @@ class MailRu
 	const FOLDER_INBOX = 0;
 	/** @var int Статус 200 ОК */
 	const STATUS_OK = 200;
+	/** @var string Название файла для cookies */
+	const COOKIES_FILE = 'cookies.txt';
 
 	/**
 	 * Конструктор класса, устанавливаем базовые свойства
@@ -82,8 +84,8 @@ class MailRu
 	 
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, self::AUTH_URL);
-		curl_setopt($curl, CURLOPT_COOKIEFILE, 'cookies.txt');
-		curl_setopt($curl, CURLOPT_COOKIEJAR, 'cookies.txt');
+		curl_setopt($curl, CURLOPT_COOKIEFILE, self::COOKIES_FILE);
+		curl_setopt($curl, CURLOPT_COOKIEJAR, self::COOKIES_FILE);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_HEADER, true);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($fields));
@@ -184,8 +186,8 @@ class MailRu
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, self::MAIL_INBOX_API . '?' . implode('&', $params));
-		curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookies.txt');
-		curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookies.txt');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, self::COOKIES_FILE);
+		curl_setopt($ch, CURLOPT_COOKIEJAR, self::COOKIES_FILE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -239,7 +241,7 @@ if ($MailRu->connect()) {
 	$parseToken = $MailRu->parseToken();
 	if ($parseToken['success']) {
 		$page = (int) $_GET['page'];
-		if (!$page) {
+		if ($page <= 0) {
 			$page = 1;
 		}
 
