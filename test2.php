@@ -73,7 +73,6 @@ class ImageGrabber
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $this->parseUrl);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
 		$response = curl_exec($curl);
@@ -109,10 +108,10 @@ class ImageGrabber
 	private function parseImages()
 	{
 		if ($this->canParse) {
-			preg_match_all('/(src=|url\()(\"|\')?((https?:)?\/\/\S+\.(png|jpe?g|gif|svg))/i', $this->response, $media);
+			preg_match_all('/(src=|url\()(\"|\')?(((https?:)?\/\/([\/\w\-\.@]+)\.(png|jpe?g|gif|svg))|(data:image\S+(=|\+)))/i', $this->response, $media);
 
 			if (is_array($media[3]) && count($media[3]) > 0) {
-				//Берем группу №3, можно было сделать array_unique($media[3])
+				//Берем группу №3, если нужна уникальность, сделать array_unique($media[3])
 				$this->images = $media[3];
 			} else {
 				$this->errorMessage = 'ERROR. На странице ' . $this->parseUrl . ' изображения не найдены.';
